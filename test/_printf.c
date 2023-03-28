@@ -1,60 +1,37 @@
-#include <stdarg.h>
-#include <unistd.h>
+#include "main.h"
+
 /**
- * _printf - produces output according to a format.
- * @format: format string containing zero or more directives.
- *
- * Return: number of characters printed (excluding the null byte used to end output to strings)
+ * _printf - Receives the main string and all the necessary parameters to
+ * print a formated string
+ * @format: A string containing all the desired characters
+ * Return: A total count of the characters printed
  */
 int _printf(const char *format, ...)
 {
-    int count = 0;
-    va_list args;
-    char c;
-    char *s;
-    va_start(args, format);
-    while (*format)
-    {
-        if (*format == '%')
-        {
-            format++;
-            switch (*format)
-            {
-                case 'c':
-                    c = va_arg(args, int);
-                    write(1, &c, 1);
-                    count++;
-                    break;
-                case 's':
-                    s = va_arg(args, char *);
-                    if (s == NULL)
-                        s = "(null)";
-                    while (*s)
-                    {
-                        write(1, s, 1);
-                        s++;
-                        count++;
-                    }
-                    break;
-                case '%':
-                    write(1, "%", 1);
-                    count++;
-                    break;
-                default:
-                    write(1, "%", 1);
-                    count++;
-                    write(1, &(*format), 1);
-                    count++;
-                    break;
-            }
-        }
-        else
-        {
-            write(1, &(*format), 1);
-            count++;
-        }
-        format++;
-    }
-    va_end(args);
-    return count;
+	int printed_chars;
+	conver_t f_list[] = {
+		{"c", print_char},
+		{"s", print_string},
+		{"%", print_percent},
+		{"d", print_integer},
+		{"i", print_integer},
+		{"b", print_binary},
+		{"r", print_reversed},
+		{"R", rot13},
+		{"u", unsigned_integer},
+		{"o", print_octal},
+		{"x", print_hex},
+		{"X", print_heX},
+		{NULL, NULL}
+	};
+	va_list arg_list;
+
+	if (format == NULL)
+		return (-1);
+
+	va_start(arg_list, format);
+	/*Calling parser function*/
+	printed_chars = parser(format, f_list, arg_list);
+	va_end(arg_list);
+	return (printed_chars);
 }
